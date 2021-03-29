@@ -1,43 +1,84 @@
-//TODO: Randomise originalNum as a string - no more hardcode
-//Randomise B and W characters in response string
-// Make q as a quit character
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
 bool InputValidation(char[]);
 bool StringChecks(char[], char[], char[], int&);
+void GenerateNumber(char[][6], char[]);
+void ResponseShuffle(char[]);
+void Endgame(char[], char[], bool&, int&);
+
+const int MAX_GUESS = 15;
 
 int main() {
-  char originalNum[] = {'1', '2', '3', '4', '5', '\0'};
+  char preDefinedArrays[6][6] = {"83452", "03921", "74520", "98053","69534", "12874"};
+  char originalNum[6];
   char userInput[10];
   char pegFeedback[] = {'_', '_', '_', '_', '_', '\0'};
   bool valid = 0, correct = 0;
   int counter = 0;
 
+  srand(time(0));
+
+
   cout << "WELCOME TO THE MASTERMIND GAME V1.0" << endl;
   cout << "A random number has been generated, your goal is to guess it. \n" <<
-  "You have unlimited amount of guesses - press 'q' to quit any time. \n";
+  "You have " << MAX_GUESS << " guesses - press 'q' to quit any time. \n";
   cout << "Good luck! \n";
 
-  while(valid == 0){
-    cout << "Enter a 5-digit number (q to quit): ";
-    cin >> userInput;
-    valid = InputValidation(userInput);
-  }
+  do{
+  GenerateNumber(preDefinedArrays, originalNum);
+  cout << originalNum;
 
-  correct = StringChecks(originalNum, userInput, pegFeedback, counter);
-  while(correct == 0){
+  while(correct == 0 && counter < MAX_GUESS){
     cout << "Enter a 5-digit number (q to quit): ";
     cin >> userInput;
+    valid = InputValidation(userInput); //Pre-condition check
+    while(valid == 0){
+      cout << "Enter a 5-digit number (q to quit): ";
+      cin >> userInput;
+      valid = InputValidation(userInput);
+    }
     correct = StringChecks(originalNum, userInput, pegFeedback, counter);
   }
+
+  /*if(userInput[0] == 'q'){
+    cout << "Ok, you lost! Goodbye!";
+    break;
+  }
+
+  if(correct == 1)
+    cout << "Congratulations! The number was: " << originalNum << endl;
+
+  if(counter == MAX_GUESS)
+    cout << "You have exhausted all your tries!" << endl;
+
+  //RESTART MENU
+  cout << "Do you want to play again? (y/n)" << endl;
+  char restart;
+  cin >> restart;
+  if(restart == 'y')
+    counter = 0;
+  else{
+    cout << "Goodbye!";
+    break;
+  }*/
+  Endgame(userInput, originalNum, correct, counter);
+
+}while(counter < MAX_GUESS);
+
 
   return 0;
 }
 bool InputValidation(char input[10])
 {
+  //Exit value
+  if(input[0] == 'q')
+    return 1;
+
   //Only digits
   for(int i = 0; input[i] != '\0'; i++){
     if(input[i] < '0' || input[i] > '9'){
@@ -66,6 +107,8 @@ bool InputValidation(char input[10])
 }
 bool StringChecks(char origin[6], char input[10], char response[6], int& counter)
 {
+  if(input[0] == 'q')
+    return 1;
   //Check for blacks
   for(int i = 0; origin[i] != '\0'; i++){
     if(origin[i] == input[i]){
@@ -91,6 +134,8 @@ bool StringChecks(char origin[6], char input[10], char response[6], int& counter
     }
   }
   counter++;
+
+  ResponseShuffle(response);
   cout << "On try: " << counter << ", response: " << response << endl;
 
   //RESET
@@ -98,5 +143,47 @@ bool StringChecks(char origin[6], char input[10], char response[6], int& counter
     response[i] = '_';
 
   return 0;
-  //Creating response
+}
+void GenerateNumber(char storage[6][6], char origin[6])
+{
+  srand(time(0));
+  int randNum = rand() % 6;
+  for (int j = 0; j < 6; ++j)
+    origin[j] = storage[randNum][j];
+}
+void ResponseShuffle(char string[6])
+{
+  char temp = string[0];
+  string[0] = string[2];
+  string[2] = temp;
+
+  temp = string[1];
+  string[1] = string[3];
+  string[3] = temp;
+}
+void Endgame(char input[10], char origin[6], bool& win, int& counter)
+{
+  if(input[0] == 'q'){
+    cout << "Ok, you lost! Goodbye!";
+    counter = (MAX_GUESS + 1);
+  }
+
+  if(win == 1)
+    cout << "Congratulations! The number was: " << origin << endl;
+
+  if(counter >= MAX_GUESS)
+    cout << "You have exhausted all your tries!" << endl;
+
+  //RESTART MENU
+  cout << "Do you want to play again? (y/n)" << endl;
+  char restart;
+  cin >> restart;
+  if(restart == 'y'){
+    counter = 0;
+    win = 0;
+  }
+  else{
+    cout << "Goodbye!";
+    counter = (MAX_GUESS + 1);
+  }
 }
