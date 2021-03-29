@@ -5,11 +5,11 @@
 
 using namespace std;
 
-bool InputValidation(char[]);
-bool StringChecks(char[], char[], char[], int&);
-void GenerateNumber(char[][6], char[]);
-void ResponseShuffle(char[]);
-void Endgame(char[], char[], bool&, int&);
+bool InputValidation(char[]); //Validates User Input
+bool StringChecks(char[], char[], char[], int&); //Checks if string matches the origin and returns pegs
+void GenerateNumber(char[][6], char[]); //Picks a random 5-digit number string
+void ResponseShuffle(char[]); //Shuffles peg response on the guess
+void Endgame(char[], char[], bool&, int&); //Checks conditions for the game to end
 
 const int MAX_GUESS = 15;
 
@@ -24,52 +24,30 @@ int main() {
   srand(time(0));
 
 
-  cout << "WELCOME TO THE MASTERMIND GAME V1.0" << endl;
-  cout << "A random number has been generated, your goal is to guess it. \n" <<
-  "You have " << MAX_GUESS << " guesses - press 'q' to quit any time. \n";
-  cout << "Good luck! \n";
+  cout << "WELCOME TO THE MASTERMIND GAME 1.0.6" << endl;
+  cout << "A random number has been generated, your goal is to guess it. \n";
 
-  do{
-  GenerateNumber(preDefinedArrays, originalNum);
-  cout << originalNum;
 
-  while(correct == 0 && counter < MAX_GUESS){
-    cout << "Enter a 5-digit number (q to quit): ";
-    cin >> userInput;
-    valid = InputValidation(userInput); //Pre-condition check
-    while(valid == 0){
+  do {
+    cout << "You have " << MAX_GUESS << " guesses - press 'q' to quit any time. \n";
+    cout << "Good luck! \n";
+    GenerateNumber(preDefinedArrays, originalNum);
+    //cout << originalNum; For tests
+
+    while(correct == 0 && counter < MAX_GUESS){
       cout << "Enter a 5-digit number (q to quit): ";
       cin >> userInput;
-      valid = InputValidation(userInput);
+      valid = InputValidation(userInput); //Pre-condition check
+      while(valid == 0){
+        cout << "Enter a 5-digit number (q to quit): ";
+        cin >> userInput;
+        valid = InputValidation(userInput);
+      }
+      correct = StringChecks(originalNum, userInput, pegFeedback, counter);
     }
-    correct = StringChecks(originalNum, userInput, pegFeedback, counter);
-  }
 
-  /*if(userInput[0] == 'q'){
-    cout << "Ok, you lost! Goodbye!";
-    break;
-  }
-
-  if(correct == 1)
-    cout << "Congratulations! The number was: " << originalNum << endl;
-
-  if(counter == MAX_GUESS)
-    cout << "You have exhausted all your tries!" << endl;
-
-  //RESTART MENU
-  cout << "Do you want to play again? (y/n)" << endl;
-  char restart;
-  cin >> restart;
-  if(restart == 'y')
-    counter = 0;
-  else{
-    cout << "Goodbye!";
-    break;
-  }*/
-  Endgame(userInput, originalNum, correct, counter);
-
-}while(counter < MAX_GUESS);
-
+    Endgame(userInput, originalNum, correct, counter);
+  } while(counter < MAX_GUESS);
 
   return 0;
 }
@@ -153,6 +131,7 @@ void GenerateNumber(char storage[6][6], char origin[6])
 }
 void ResponseShuffle(char string[6])
 {
+  //Swaps 2 characters in the string
   char temp = string[0];
   string[0] = string[2];
   string[2] = temp;
