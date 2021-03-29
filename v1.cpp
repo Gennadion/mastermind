@@ -10,6 +10,7 @@ bool StringChecks(char[], char[], char[], int&); //Checks if string matches the 
 void GenerateNumber(char[][6], char[]); //Picks a random 5-digit number string
 void ResponseShuffle(char[]); //Shuffles peg response on the guess
 void Endgame(char[], char[], bool&, int&); //Checks conditions for the game to end
+void RestartGame(int&, bool&); //Prompts the user to restart
 
 const int MAX_GUESS = 15;
 
@@ -24,7 +25,7 @@ int main() {
   srand(time(0));
 
 
-  cout << "WELCOME TO THE MASTERMIND GAME 1.0.6" << endl;
+  cout << "WELCOME TO THE MASTERMIND GAME 1.0.7" << endl;
   cout << "A random number has been generated, your goal is to guess it. \n";
 
 
@@ -143,17 +144,23 @@ void ResponseShuffle(char string[6])
 void Endgame(char input[10], char origin[6], bool& win, int& counter)
 {
   if(input[0] == 'q'){
+    win = 0;
     cout << "Ok, you lost! Goodbye!";
     counter = (MAX_GUESS + 1);
   }
 
-  if(win == 1)
+  else if(win == 1){
     cout << "Congratulations! The number was: " << origin << endl;
+    RestartGame(counter, win);
+  }
 
-  if(counter >= MAX_GUESS)
+  else if(counter >= MAX_GUESS){
     cout << "You have exhausted all your tries!" << endl;
-
-  //RESTART MENU
+    RestartGame(counter, win);
+  }
+}
+void RestartGame(int& counter, bool& win)
+{
   cout << "Do you want to play again? (y/n)" << endl;
   char restart;
   cin >> restart;
